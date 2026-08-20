@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Resume Screening</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="brand">
+
+            <div class="logo">
+                SR
+            </div>
+
+            <div>
+                <h1>Smart Resume Screening</h1>
+
+                <p class="subtitle">
+                    AI-Powered Resume Analysis & Job Matching
+                </p>
+            </div>
+
+        </div>
+
+        <div class="header-badge">
+            SMART ATS
+        </div>
+
+    </header>
+
+
+    <!-- HERO -->
+    <section class="hero">
+
+        <span class="eyebrow">
+            RESUME INTELLIGENCE
+        </span>
+
+        <h2>
+            Find out how well your resume
+            matches the job.
+        </h2>
+
+        <p>
+            Upload your resume and paste the job description.
+            The system analyzes technical skills and generates
+            a compatibility score.
+        </p>
+
+    </section>
+
+
+    <!-- UPLOAD -->
+    <section class="upload-card">
+
+        <div class="section-title">
+
+            <div class="section-icon">
+                📄
+            </div>
+
+            <div>
+                <h2>Analyze Your Resume</h2>
+
+                <p>
+                    Supported formats: PDF and DOCX
+                </p>
+            </div>
+
+        </div>
+
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <label for="resume">
+                Upload Resume
+            </label>
+
+            <div class="file-box">
+
+                <input
+                    type="file"
+                    id="resume"
+                    name="resume"
+                    accept=".pdf,.docx"
+                    required
+                >
+
+                <small>
+                    Upload your latest resume
+                </small>
+
+            </div>
+
+
+            <label for="job_description">
+                Job Description
+            </label>
+
+            <textarea
+                id="job_description"
+                name="job_description"
+                rows="9"
+                placeholder="Paste the complete job description here..."
+                required
+            ></textarea>
+
+
+            <button type="submit">
+                🔍 Analyze Resume
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- ERROR -->
+    {% if error %}
+
+    <div class="error">
+
+        <strong>⚠ Analysis Error</strong>
+
+        <p>
+            {{ error }}
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- RESULT -->
+    {% if result %}
+
+    <section class="result">
+
+        <!-- RESULT HEADER -->
+        <div class="result-header">
+
+            <div>
+
+                <span class="eyebrow">
+                    ANALYSIS REPORT
+                </span>
+
+                <h2>
+                    Resume Analysis Result
+                </h2>
+
+                <p>
+                    Your resume has been compared with the
+                    provided job description.
+                </p>
+
+            </div>
+
+            <div class="status-badge">
+                ✓ Analysis Complete
+            </div>
+
+        </div>
+
+
+        <!-- SCORE -->
+        <div class="score-panel">
+
+            <div class="score-circle">
+
+                <div class="score-number">
+                    {{ result.score }}%
+                </div>
+
+                <div class="score-label">
+                    Match Score
+                </div>
+
+            </div>
+
+
+            <div class="score-info">
+
+                <span class="small-title">
+                    RESUME COMPATIBILITY
+                </span>
+
+
+                {% if result.score >= 80 %}
+
+                <h3 class="excellent">
+                    Excellent Match 🎯
+                </h3>
+
+                <p class="score-message">
+                    Your resume strongly matches the requirements
+                    of this job.
+                </p>
+
+
+                {% elif result.score >= 60 %}
+
+                <h3 class="good">
+                    Good Match 👍
+                </h3>
+
+                <p class="score-message">
+                    Your resume matches many of the required skills.
+                </p>
+
+
+                {% elif result.score >= 40 %}
+
+                <h3 class="moderate">
+                    Moderate Match
+                </h3>
+
+                <p class="score-message">
+                    Your resume has some relevant skills.
+                    Adding more relevant skills may improve the match.
+                </p>
+
+
+                {% else %}
+
+                <h3 class="improve">
+                    Needs Improvement
+                </h3>
+
+                <p class="score-message">
+                    Your resume currently has a low match with
+                    the job requirements.
+                </p>
+
+                {% endif %}
+
+
+                <!-- STATISTICS -->
+                <div class="analysis-stats">
+
+                    <div class="stat">
+
+                        <span class="stat-number">
+                            {{ result.matched_keywords|length + result.missing_keywords|length }}
+                        </span>
+
+                        <span class="stat-label">
+                            Required Skills
+                        </span>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-number matched-number">
+                            {{ result.matched_keywords|length }}
+                        </span>
+
+                        <span class="stat-label">
+                            Matched
+                        </span>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-number missing-number">
+                            {{ result.missing_keywords|length }}
+                        </span>
+
+                        <span class="stat-label">
+                            Missing
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SKILLS -->
+        <div class="skills-container">
+
+
+            <!-- MATCHED SKILLS -->
+            <div class="skill-card matched">
+
+                <div class="card-heading">
+
+                    <div class="card-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Matched Skills
+                        </h3>
+
+                        <p>
+                            Skills detected in your resume
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if result.matched_keywords %}
+
+                <div class="skill-list">
+
+                    {% for keyword in result.matched_keywords %}
+
+                    <span class="skill">
+                        ✓ {{ keyword }}
+                    </span>
+
+                    {% endfor %}
+
+                </div>
+
+                {% else %}
+
+                <p class="empty-message">
+                    No matching technical skills found.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- MISSING SKILLS -->
+            <div class="skill-card missing">
+
+                <div class="card-heading">
+
+                    <div class="card-icon">
+                        !
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Missing Skills
+                        </h3>
+
+                        <p>
+                            Skills recommended for this job
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if result.missing_keywords %}
+
+                <div class="skill-list">
+
+                    {% for keyword in result.missing_keywords %}
+
+                    <span class="skill missing-skill">
+                        + {{ keyword }}
+                    </span>
+
+                    {% endfor %}
+
+                </div>
+
+                {% else %}
+
+                <p class="empty-message">
+                    No missing skills detected. Great job!
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- RECOMMENDATION -->
+        <div class="recommendation-card">
+
+            <div class="card-heading">
+
+                <div class="card-icon">
+                    💡
+                </div>
+
+                <div>
+
+                    <h3>
+                        Recommendation
+                    </h3>
+
+                    <p>
+                        How you can improve your resume
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if result.missing_keywords %}
+
+            <p>
+                Consider adding these relevant skills to your
+                resume if you have experience with them:
+            </p>
+
+
+            <div class="recommendation-list">
+
+                {% for keyword in result.missing_keywords %}
+
+                <span class="recommendation-item">
+                    {{ keyword }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <p>
+                Your resume already contains the major skills
+                detected from this job description.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- FOOTER ACTION -->
+        <div class="result-footer">
+
+            <p>
+                Smart Resume Screening • AI-Powered Resume Analysis
+            </p>
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>
